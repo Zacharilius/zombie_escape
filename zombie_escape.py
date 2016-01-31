@@ -32,11 +32,11 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     player.go_north()
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_RIGHT:
                     player.go_east()
                 elif event.key == pygame.K_DOWN:
                     player.go_south()
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_LEFT:
                     player.go_west()
 
             if event.type == pygame.KEYUP:
@@ -44,10 +44,11 @@ def main():
 
         active_sprite_list.update()
 
+        screen.fill(constants.BLUE)
         active_sprite_list.draw(screen)
 
 
-        clock.tick(60)
+        clock.tick(65)
 
         pygame.display.flip()
 
