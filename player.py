@@ -90,25 +90,33 @@ class Player(pygame.sprite.Sprite):
 
 		self.rect = self.image.get_rect()
 
-	def update(self):
-		self.rect.x += self.change_x
-		self.rect.y += self.change_y
+	def update(self):		
+		if self.rect.x + self.change_x < 0 or self.rect.x + self.change_x > constants.SCREEN_WIDTH:
+			pos_x = self.rect.x
+		else:
+			pos_x = self.rect.x - self.change_x
+			self.rect.x += self.change_x
 
-		pos_x = self.rect.x 
-		pos_y = self.rect.y
+		if self.rect.y + self.change_y < 0 or self.rect.y + self.change_y > constants.SCREEN_HEIGHT:
+			pos_y = self.rect.y - self.change_y
+		else:
+			self.rect.y += self.change_y
+			pos_y = self.rect.y
+			
 
+		print(pos_x)
+		print(pos_y)
 		if self.direction == "N":
 			frame = (pos_y // 65) % len(self.walking_frames_n)
 			self.image = self.walking_frames_n[frame]
-			print(frame)
 		elif self.direction == "E":
-			frame = (pos_x // 40) % len(self.walking_frames_e)
+			frame = (pos_x // 100) % len(self.walking_frames_e)
 			self.image = self.walking_frames_e[frame]
 		elif self.direction == "S":
-			frame = (pos_y // 65) % len(self.walking_frames_s)
+			frame = (pos_y // 100) % len(self.walking_frames_s)
 			self.image = self.walking_frames_s[frame]
 		elif self.direction == "W":
-			frame = (pos_x // 40) % len(self.walking_frames_w)
+			frame = (pos_x // 65) % len(self.walking_frames_w)
 			self.image = self.walking_frames_w[frame]
 
 	def go_north(self):
