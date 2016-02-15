@@ -10,6 +10,10 @@ class Player(pygame.sprite.Sprite):
 	change_x = 0
 	change_y = 0
 
+	zombie_sprite_width = 65
+	zombie_sprite_height = 100
+
+
 	walking_frames_n = []
 	walking_frames_e = []
 	walking_frames_s = []
@@ -90,22 +94,19 @@ class Player(pygame.sprite.Sprite):
 
 		self.rect = self.image.get_rect()
 
-	def update(self):		
-		if self.rect.x + self.change_x < 0 or self.rect.x + self.change_x > constants.SCREEN_WIDTH:
+	def update(self):
+		if (self.rect.x + self.change_x < 0) or (self.rect.x + self.change_x + self.zombie_sprite_width > constants.SCREEN_WIDTH):
 			pos_x = self.rect.x
 		else:
 			pos_x = self.rect.x - self.change_x
 			self.rect.x += self.change_x
 
-		if self.rect.y + self.change_y < 0 or self.rect.y + self.change_y > constants.SCREEN_HEIGHT:
+		if self.rect.y + self.change_y < 0 or self.rect.y + self.change_y  + self.zombie_sprite_height > constants.SCREEN_HEIGHT:
 			pos_y = self.rect.y - self.change_y
 		else:
 			self.rect.y += self.change_y
 			pos_y = self.rect.y
 			
-
-		print(pos_x)
-		print(pos_y)
 		if self.direction == "N":
 			frame = (pos_y // 65) % len(self.walking_frames_n)
 			self.image = self.walking_frames_n[frame]
