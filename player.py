@@ -13,82 +13,22 @@ class Player(pygame.sprite.Sprite):
 	zombie_sprite_width = 65
 	zombie_sprite_height = 100
 
-
-	walking_frames_n = []
-	walking_frames_e = []
-	walking_frames_s = []
-	walking_frames_w = []
-
 	direction = "N"
-
-	level = None
 
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 
 		sprite_sheet = SpriteSheet('images/zombie_topdown.png')
 
-		
-		image = sprite_sheet.get_image(535,395,65,100)
-		self.walking_frames_n.append(image)		
-		image = sprite_sheet.get_image(661,395,65,100)
-		self.walking_frames_n.append(image)		
-		image = sprite_sheet.get_image(794,395,65,100)
-		self.walking_frames_n.append(image)
-		image = sprite_sheet.get_image(921,395,65,100)
-		self.walking_frames_n.append(image)
-		image = sprite_sheet.get_image(1047,395,65,100)
-		self.walking_frames_n.append(image)
-		image = sprite_sheet.get_image(1177,395,65,100)
-		self.walking_frames_n.append(image)
-		image = sprite_sheet.get_image(1305,395,65,100)
-		self.walking_frames_n.append(image)
+		sprite_sheet_num_cols = 36
+		sprite_sheet_cell_width = int(4608 / sprite_sheet_num_cols)
+		sprite_sheet_num_rows = 8
+		sprite_sheet_cell_height = int(1024 / sprite_sheet_num_rows)
 
-
-		image = sprite_sheet.get_image(535,676,100,65)
-		self.walking_frames_e.append(image)		
-		image = sprite_sheet.get_image(661,676,100,65)
-		self.walking_frames_e.append(image)		
-		image = sprite_sheet.get_image(794,676,100,65)
-		self.walking_frames_e.append(image)
-		image = sprite_sheet.get_image(921,676,100,65)
-		self.walking_frames_e.append(image)
-		image = sprite_sheet.get_image(1047,676,100,65)
-		self.walking_frames_e.append(image)
-		image = sprite_sheet.get_image(1177,676,100,65)
-		self.walking_frames_e.append(image)
-		image = sprite_sheet.get_image(1305,676,100,65)
-		self.walking_frames_e.append(image)
-
-		image = sprite_sheet.get_image(535,921,65,100)
-		self.walking_frames_s.append(image)		
-		image = sprite_sheet.get_image(661,921,65,100)
-		self.walking_frames_s.append(image)		
-		image = sprite_sheet.get_image(794,921,65,100)
-		self.walking_frames_s.append(image)
-		image = sprite_sheet.get_image(921,921,65,100)
-		self.walking_frames_s.append(image)
-		image = sprite_sheet.get_image(1047,921,65,100)
-		self.walking_frames_s.append(image)
-		image = sprite_sheet.get_image(1177,921,65,100)
-		self.walking_frames_s.append(image)
-		image = sprite_sheet.get_image(1305,921,65,100)
-		self.walking_frames_s.append(image)
-
-		image = sprite_sheet.get_image(525,168,100,65)
-		self.walking_frames_w.append(image)		
-		image = sprite_sheet.get_image(651,168,100,65)
-		self.walking_frames_w.append(image)		
-		image = sprite_sheet.get_image(784,168,100,65)
-		self.walking_frames_w.append(image)
-		image = sprite_sheet.get_image(911,168,100,65)
-		self.walking_frames_w.append(image)
-		image = sprite_sheet.get_image(1037,168,100,65)
-		self.walking_frames_w.append(image)
-		image = sprite_sheet.get_image(1167,168,100,65)
-		self.walking_frames_w.append(image)
-		image = sprite_sheet.get_image(1295,168,100,65)
-		self.walking_frames_w.append(image)
+		self.walking_frames_n = get_sprite_images(sprite_sheet, 512, 384, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
+		self.walking_frames_e = get_sprite_images(sprite_sheet, 512, 640, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
+		self.walking_frames_s = get_sprite_images(sprite_sheet, 512, 896, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
+		self.walking_frames_w = get_sprite_images(sprite_sheet, 512, 128, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
 
 		self.image = self.walking_frames_n[0]
 
@@ -106,7 +46,7 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.rect.y += self.change_y
 			pos_y = self.rect.y
-			
+
 		if self.direction == "N":
 			frame = (pos_y // 65) % len(self.walking_frames_n)
 			self.image = self.walking_frames_n[frame]
@@ -139,3 +79,13 @@ class Player(pygame.sprite.Sprite):
 	def stop(self):
 		self.change_x = 0
 		self.change_y = 0
+
+
+def get_sprite_images(sprite_sheet, x, y, width, height, sprite_cols):
+	images = []
+	end_x = x + sprite_cols * width
+	for i in range(x, end_x, width):
+		images.append(sprite_sheet.get_image(i, y, width, height))
+	return images
+
+
