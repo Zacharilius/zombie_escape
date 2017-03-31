@@ -1,3 +1,4 @@
+from background import Background
 import constants
 from player import Player
 import pygame
@@ -10,10 +11,11 @@ def main():
     window = pygame.display.set_mode(size)
     pygame.display.set_caption('Zombie Escape')
 
-    player = Player()
-
     active_sprite_list = pygame.sprite.Group()
 
+    background = Background(window)
+
+    player = Player()
     player.rect.x = 340
     player.rect.y = constants.SCREEN_HEIGHT - player.rect.height
     active_sprite_list.add(player)
@@ -39,7 +41,7 @@ def main():
 
         window.fill(constants.WHITE)
 
-
+        background.update()
 
         active_sprite_list.update()
         active_sprite_list.draw(window)

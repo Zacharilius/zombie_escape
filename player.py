@@ -25,7 +25,6 @@ class Player(pygame.sprite.Sprite):
 		self.walking_frames_w = get_sprite_images(sprite_sheet, 512, 128, self.sprite_width, self.sprite_height, 7)
 
 		self.image = self.walking_frames_n[0]
-
 		self.rect = self.image.get_rect()
 
 	def update(self):
