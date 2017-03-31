@@ -1,7 +1,6 @@
-import pygame
-
 import constants
 from player import Player
+import pygame
 import sprite_image
 
 def main():
@@ -47,5 +46,5 @@ def main():
 
         pygame.display.flip()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -1,7 +1,6 @@
-import pygame
-
 import constants
 from player import Player
+import pygame
 import sprite_image
 
 def main():

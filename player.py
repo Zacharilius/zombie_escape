@@ -1,9 +1,5 @@
-
-
-import pygame
-
 import constants
-
+import pygame
 from sprite_image import SpriteSheet
 
 class Player(pygame.sprite.Sprite):
@@ -13,7 +9,7 @@ class Player(pygame.sprite.Sprite):
 	zombie_sprite_width = 65
 	zombie_sprite_height = 100
 
-	direction = "N"
+	direction = 'N'
 
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -21,9 +17,10 @@ class Player(pygame.sprite.Sprite):
 		sprite_sheet = SpriteSheet('images/zombie_topdown.png')
 
 		sprite_sheet_num_cols = 36
-		sprite_sheet_cell_width = int(4608 / sprite_sheet_num_cols)
+		sprite_sheet_cell_width = int(sprite_sheet.get_width() / sprite_sheet_num_cols)
+
 		sprite_sheet_num_rows = 8
-		sprite_sheet_cell_height = int(1024 / sprite_sheet_num_rows)
+		sprite_sheet_cell_height = int(sprite_sheet.get_height() / sprite_sheet_num_rows)
 
 		self.walking_frames_n = get_sprite_images(sprite_sheet, 512, 384, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
 		self.walking_frames_e = get_sprite_images(sprite_sheet, 512, 640, sprite_sheet_cell_width, sprite_sheet_cell_height, 7)
@@ -47,34 +44,34 @@ class Player(pygame.sprite.Sprite):
 			self.rect.y += self.change_y
 			pos_y = self.rect.y
 
-		if self.direction == "N":
+		if self.direction == 'N':
 			frame = (pos_y // 65) % len(self.walking_frames_n)
 			self.image = self.walking_frames_n[frame]
-		elif self.direction == "E":
+		elif self.direction == 'E':
 			frame = (pos_x // 100) % len(self.walking_frames_e)
 			self.image = self.walking_frames_e[frame]
-		elif self.direction == "S":
+		elif self.direction == 'S':
 			frame = (pos_y // 100) % len(self.walking_frames_s)
 			self.image = self.walking_frames_s[frame]
-		elif self.direction == "W":
+		elif self.direction == 'W':
 			frame = (pos_x // 65) % len(self.walking_frames_w)
 			self.image = self.walking_frames_w[frame]
 
 	def go_north(self):
 		self.change_y = -6
-		self.direction = "N"
+		self.direction = 'N'
 
 	def go_east(self):
 		self.change_x = 6
-		self.direction = "E"
+		self.direction = 'E'
 
 	def go_south(self):
 		self.change_y = 6
-		self.direction = "S"
+		self.direction = 'S'
 
 	def go_west(self):
 		self.change_x = -6
-		self.direction = "W"
+		self.direction = 'W'
 
 	def stop(self):
 		self.change_x = 0
