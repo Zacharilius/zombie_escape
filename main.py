@@ -7,7 +7,7 @@ def main():
     pygame.init()
 
     size = [constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT]
-    screen = pygame.display.set_mode(size)
+    window = pygame.display.set_mode(size)
     pygame.display.set_caption('Zombie Escape')
 
     player = Player()
@@ -37,10 +37,12 @@ def main():
             elif event.type == pygame.KEYUP:
                 player.stop()
 
-        active_sprite_list.update()
+        window.fill(constants.WHITE)
 
-        screen.fill(constants.WHITE)
-        active_sprite_list.draw(screen)
+
+
+        active_sprite_list.update()
+        active_sprite_list.draw(window)
 
         clock.tick(65)
 
