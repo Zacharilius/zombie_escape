@@ -22,6 +22,9 @@ def main():
 
     clock = pygame.time.Clock()
 
+    pygame.mixer.music.load('assets/game_music.ogg')
+    pygame.mixer.music.play(-1, 0.0)  # -1 Causes to loop indefinitely
+
     done = False
     while not done:
         for event in pygame.event.get():

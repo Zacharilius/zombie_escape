@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 
-		sprite_sheet = SpriteSheet('images/zombie_topdown.png')
+		sprite_sheet = SpriteSheet('assets/zombie_topdown.png')
 
 		sprite_sheet_num_cols = 36
 		self.sprite_width = sprite_sheet.get_width() // sprite_sheet_num_cols
