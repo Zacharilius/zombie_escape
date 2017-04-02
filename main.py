@@ -53,7 +53,14 @@ def main():
                 elif event.key == pygame.K_LEFT:
                     player.go_west()
             elif event.type == pygame.KEYUP:
-                player.stop()
+                if event.key == pygame.K_UP:
+                    player.stop_north()
+                elif event.key == pygame.K_RIGHT:
+                    player.stop_east()
+                elif event.key == pygame.K_DOWN:
+                    player.stop_south()
+                elif event.key == pygame.K_LEFT:
+                    player.stop_west()
 
         window.fill(settings.WHITE)
 
@@ -194,6 +201,10 @@ class Player(pygame.sprite.Sprite):
         self.moving_south = False
         self.change_y = -self.speed
 
+    def stop_north(self):
+        self.moving_north = False
+        self.change_y = 0
+
     def can_move_east(self):
         return not self.can_move_in_directions(self.speed, 0)
 
@@ -201,6 +212,10 @@ class Player(pygame.sprite.Sprite):
         self.moving_east = True
         self.moving_west = False
         self.change_x = self.speed
+
+    def stop_east(self):
+        self.moving_east = False
+        self.change_x = 0
 
     def can_move_south(self):
         return not self.can_move_in_directions(0, self.speed)
@@ -210,6 +225,10 @@ class Player(pygame.sprite.Sprite):
         self.moving_north = False
         self.change_y = self.speed
 
+    def stop_south(self):
+        self.moving_south = False
+        self.change_y = 0
+
     def can_move_west(self):
         return not self.can_move_in_directions(-self.speed, 0)
 
@@ -218,14 +237,9 @@ class Player(pygame.sprite.Sprite):
         self.moving_east = False
         self.change_x = -self.speed
 
-    def stop(self):
-        self.moving_south = False
+    def stop_west(self):
         self.moving_west = False
-        self.moving_north = False
-        self.moving_east = False
-
         self.change_x = 0
-        self.change_y = 0
 
 
 class Wall(pygame.sprite.Sprite):
