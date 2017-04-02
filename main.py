@@ -26,7 +26,12 @@ def main():
     clock = pygame.time.Clock()
     time_since_last_brain_created = 0
 
-    # === Sound ====
+    # ==== Font ====
+
+    font_size = 16
+    font = pygame.font.Font(None, font_size)  # Default system font
+
+    # ==== Sound ====
 
     brain_eating_sound = Sound('assets/zombie_brain_eating.ogg')
 
@@ -63,7 +68,6 @@ def main():
         for brain in groupcollide(brain_sprite_list, player_sprite_list, True, False, collided=None):
             brains_eaten += 1
             brain_eating_sound.play()
-            print(brains_eaten)  # TODO: Display score on screen
 
         wall_sprite_list.update()
         wall_sprite_list.draw(window)
@@ -74,10 +78,17 @@ def main():
         brain_sprite_list.update()
         brain_sprite_list.draw(window)
 
+        brains_eaten_message_image = get_brains_eaten_message_image(font, brains_eaten)
+        window.blit(brains_eaten_message_image, (settings.SCREEN_WIDTH - brains_eaten_message_image.get_width() - 20, 20))
+
         clock.tick(65)
 
         pygame.display.flip()
 
+
+def get_brains_eaten_message_image(font, brains_eaten):
+    image = font.render(str(brains_eaten) + ' brains eaten', True, settings.RED)
+    return image
 
 class SpriteSheet(object):
     sprite_sheet = None
