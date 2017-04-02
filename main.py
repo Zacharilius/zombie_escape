@@ -12,20 +12,7 @@ def main():
     window = pygame.display.set_mode(size)
     pygame.display.set_caption('Zombie Escape')
 
-    wall_sprite_list = pygame.sprite.Group()
-    rect_height = 100
-    x, y = 0, 1 * (settings.SCREEN_HEIGHT // 3) - (rect_height / 2)
-    wall_nw = Wall(x, y)
-    wall_sprite_list.add(wall_nw)
-    x, y = 2 * (settings.SCREEN_WIDTH // 3), 1 * (settings.SCREEN_HEIGHT // 3) - (rect_height / 2)
-    wall_ne = Wall(x, y)
-    wall_sprite_list.add(wall_ne)
-    x, y = 2 * (settings.SCREEN_WIDTH // 3), 2 * (settings.SCREEN_HEIGHT // 3) - (rect_height / 2)
-    wall_se = Wall(x, y)
-    wall_sprite_list.add(wall_se)
-    x, y = 0, 2 * (settings.SCREEN_HEIGHT // 3) - (rect_height / 2)
-    wall_sw = Wall(x, y)
-    wall_sprite_list.add(wall_sw)
+    wall_sprite_list = Wall.create_walls_sprite_group()
 
     player_sprite_list = pygame.sprite.Group()
     player = Player(wall_sprite_list)
@@ -152,17 +139,18 @@ class Player(pygame.sprite.Sprite):
         return images
 
     def update(self):
-        if (self.rect.x + self.change_x < 0) or (self.rect.x + self.change_x + self.sprite_width > settings.SCREEN_WIDTH):
-            pos_x = self.rect.x
-        else:
-            pos_x = self.rect.x - self.change_x
-            self.rect.x += self.change_x
+        if (self.moving_north and not self.can_move_north() or
+                self.moving_east and not self.can_move_east() or
+                self.moving_south and not self.can_move_south() or
+                self.moving_west and not self.can_move_west()):
+            return
 
-        if self.rect.y + self.change_y < 0 or self.rect.y + self.change_y  + self.sprite_height > settings.SCREEN_HEIGHT:
-            pos_y = self.rect.y - self.change_y
-        else:
-            pos_y = self.rect.y
-            self.rect.y += self.change_y
+
+        pos_x = self.rect.x - self.change_x
+        self.rect.x += self.change_x
+
+        pos_y = self.rect.y
+        self.rect.y += self.change_y
 
         frame_multiplier = 6
         if self.moving_north:
@@ -178,24 +166,41 @@ class Player(pygame.sprite.Sprite):
             frame = (pos_x * frame_multiplier // self.sprite_width) % len(self.walking_frames_w)
             self.image = self.walking_frames_w[frame]
 
-    def is_colliding(self):
-        return pygame.sprite.spritecollideany(self, self.collision_sprite_group) is not None
+    def can_move_in_directions(self, x, y):
+        for sprite in self.collision_sprite_group.sprites():
+            rect = self.rect.copy()
+            rect.x += x
+            rect.y += y
+            if sprite.rect.colliderect(rect):
+                return True
+        return False
+
+    def can_move_north(self):
+        return not self.can_move_in_directions(0, -self.speed)
 
     def go_north(self):
         self.moving_north = True
         self.moving_south = False
         self.change_y = -self.speed
 
+    def can_move_east(self):
+        return not self.can_move_in_directions(self.speed, 0)
+
     def go_east(self):
         self.moving_east = True
         self.moving_west = False
         self.change_x = self.speed
+
+    def can_move_south(self):
+        return not self.can_move_in_directions(0, self.speed)
 
     def go_south(self):
         self.moving_south = True
         self.moving_north = False
         self.change_y = self.speed
 
+    def can_move_west(self):
+        return not self.can_move_in_directions(-self.speed, 0)
 
     def go_west(self):
         self.moving_west = True
@@ -214,9 +219,10 @@ class Player(pygame.sprite.Sprite):
 
 class Wall(pygame.sprite.Sprite):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.Surface([settings.SCREEN_WIDTH // 3, 100])
+
+        self.image = pygame.Surface([width, height])
         self.image.fill(settings.BLACK)
 
         self.rect = self.image.get_rect()
@@ -225,6 +231,48 @@ class Wall(pygame.sprite.Sprite):
 
     def update(self):
         pass
+
+    @staticmethod
+    def create_walls_sprite_group():
+        wall_sprite_list = pygame.sprite.Group()
+
+        # Inside Walls
+        inside_wall_width = settings.SCREEN_WIDTH // 3
+        inside_wall_height = 20
+
+        x, y = 0, 1 * (settings.SCREEN_HEIGHT // 3) - (inside_wall_height / 2)
+        wall_nw = Wall(x, y, inside_wall_width, inside_wall_height)
+        wall_sprite_list.add(wall_nw)
+
+        x, y = 2 * (settings.SCREEN_WIDTH // 3), 1 * (settings.SCREEN_HEIGHT // 3) - (inside_wall_height / 2)
+        wall_ne = Wall(x, y, inside_wall_width, inside_wall_height)
+        wall_sprite_list.add(wall_ne)
+
+        x, y = 2 * (settings.SCREEN_WIDTH // 3), 2 * (settings.SCREEN_HEIGHT // 3) - (inside_wall_height / 2)
+        wall_se = Wall(x, y, inside_wall_width, inside_wall_height)
+        wall_sprite_list.add(wall_se)
+
+        x, y = 0, 2 * (settings.SCREEN_HEIGHT // 3) - (inside_wall_height / 2)
+        wall_sw = Wall(x, y, inside_wall_width, inside_wall_height)
+        wall_sprite_list.add(wall_sw)
+
+        # Outside Border Wals
+        border_wall_thickness = 5
+
+        border_wall_n = Wall(0, 0, settings.SCREEN_WIDTH, border_wall_thickness)
+        wall_sprite_list.add(border_wall_n)
+
+        border_wall_e = Wall(settings.SCREEN_WIDTH - border_wall_thickness, 0, border_wall_thickness, settings.SCREEN_HEIGHT)
+        wall_sprite_list.add(border_wall_e)
+
+        border_wall_s = Wall(0, settings.SCREEN_HEIGHT - border_wall_thickness, settings.SCREEN_WIDTH, border_wall_thickness)
+        wall_sprite_list.add(border_wall_s)
+
+        border_wall_w = Wall(0, 0, border_wall_thickness, settings.SCREEN_HEIGHT)
+        wall_sprite_list.add(border_wall_w)
+
+        return wall_sprite_list
+
 
 
 class Brain(pygame.sprite.Sprite):
