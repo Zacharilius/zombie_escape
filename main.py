@@ -12,6 +12,23 @@ def main():
     window = pygame.display.set_mode(size)
     pygame.display.set_caption('Zombie Escape')
 
+    # ==== Init Screen ====
+
+    show_intro_screen = True
+
+    intro_title_font_size = 72
+    intro_title_font = pygame.font.Font(None, intro_title_font_size)  # Default system font
+    intro_font_title_image = intro_title_font.render('Brains... it\'s what\'s for dinner', True, settings.RED)
+
+    intro_screen_show_time = 5000 # 5 seconds
+
+    # ==== Game ====
+
+    # ---- Sprites ----
+
+    background = Background()
+    background_single_sprite_group = pygame.sprite.GroupSingle(background)
+
     wall_sprite_list = Wall.create_walls_sprite_group()
 
     player_sprite_list = pygame.sprite.Group()
@@ -23,15 +40,17 @@ def main():
     brain_sprite_list = pygame.sprite.Group()
     brains_eaten = 0
 
+    # ---- Clock ----
+
     clock = pygame.time.Clock()
     time_since_last_brain_created = 0
 
-    # ==== Font ====
+    # ---- Font ----
 
-    font_size = 16
-    font = pygame.font.Font(None, font_size)  # Default system font
+    brains_left_font_size = 16
+    brains_left_font = pygame.font.Font(None, brains_left_font_size)  # Default system font
 
-    # ==== Sound ====
+    # ---- Sound ----
 
     brain_eating_sound = Sound('assets/zombie_brain_eating.ogg')
 
@@ -44,49 +63,59 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.go_north()
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.go_east()
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     player.go_south()
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.go_west()
             elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
                     player.stop_north()
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     player.stop_east()
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     player.stop_south()
-                elif event.key == pygame.K_LEFT:
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     player.stop_west()
 
         window.fill(settings.WHITE)
 
-        time_since_last_brain_created += clock.get_time()
-        ten_seconds = 10000
-        if time_since_last_brain_created > ten_seconds:
-            x, y = random.randint(0, settings.SCREEN_WIDTH), random.randint(0, settings.SCREEN_HEIGHT)
-            brain = Brain(x, y)  # TODO pass in x, y
-            brain_sprite_list.add(brain)
-            time_since_last_brain_created = 0
+        if show_intro_screen:
+            window.blit(intro_font_title_image, (settings.SCREEN_WIDTH / 2 - intro_font_title_image.get_width() / 2, settings.SCREEN_WIDTH / 3))
 
-        for brain in groupcollide(brain_sprite_list, player_sprite_list, True, False, collided=None):
-            brains_eaten += 1
-            brain_eating_sound.play()
+            if pygame.time.get_ticks() > intro_screen_show_time:
+                show_intro_screen = False
 
-        wall_sprite_list.update()
-        wall_sprite_list.draw(window)
+        else:
+            time_since_last_brain_created += clock.get_time()
+            ten_seconds = 10000
+            if time_since_last_brain_created > ten_seconds:
+                x, y = random.randint(0, settings.SCREEN_WIDTH), random.randint(0, settings.SCREEN_HEIGHT)
+                brain = Brain(x, y)  # TODO pass in x, y
+                brain_sprite_list.add(brain)
+                time_since_last_brain_created = 0
 
-        player_sprite_list.update()
-        player_sprite_list.draw(window)
+            for brain in groupcollide(brain_sprite_list, player_sprite_list, True, False, collided=None):
+                brains_eaten += 1
+                brain_eating_sound.play()
 
-        brain_sprite_list.update()
-        brain_sprite_list.draw(window)
+            background_single_sprite_group.update()
+            background_single_sprite_group.draw(window)
 
-        brains_eaten_message_image = get_brains_eaten_message_image(font, brains_eaten)
-        window.blit(brains_eaten_message_image, (settings.SCREEN_WIDTH - brains_eaten_message_image.get_width() - 20, 20))
+            wall_sprite_list.update()
+            wall_sprite_list.draw(window)
+
+            player_sprite_list.update()
+            player_sprite_list.draw(window)
+
+            brain_sprite_list.update()
+            brain_sprite_list.draw(window)
+
+            brains_eaten_message_image = get_brains_eaten_message_image(brains_left_font, brains_eaten)
+            window.blit(brains_eaten_message_image, (settings.SCREEN_WIDTH - brains_eaten_message_image.get_width() - 20, 20))
 
         clock.tick(65)
 
@@ -114,6 +143,20 @@ class SpriteSheet(object):
         image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
         image.set_colorkey(settings.BLACK)
         return image
+
+
+class Background(pygame.sprite.Sprite):
+
+    def __init__(self):
+        super().__init__()
+
+        self.image = pygame.image.load("assets/stone_background.jpg")
+        self.rect = self.image.get_rect()
+        self.rect.x = 0
+        self.rect.y = 0
+
+    def update(self):
+        pass
 
 
 class Player(pygame.sprite.Sprite):
