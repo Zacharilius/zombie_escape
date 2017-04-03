@@ -16,8 +16,8 @@ def main():
 
     show_intro_screen = True
 
-    intro_title_font_size = 72
-    intro_title_font = pygame.font.Font(None, intro_title_font_size)  # Default system font
+    intro_title_font_size = 60
+    intro_title_font = pygame.font.Font('assets/jonathan-s-harris_something-strange/something_strange.ttf', intro_title_font_size)  # Default system font
     intro_font_title_image = intro_title_font.render('Brains... it\'s what\'s for dinner', True, settings.RED)
 
     intro_screen_show_time = 5000 # 5 seconds
