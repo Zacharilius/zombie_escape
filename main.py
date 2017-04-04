@@ -209,18 +209,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self):
-        if (self.moving_north and not self.can_move_north() or
-                self.moving_east and not self.can_move_east() or
-                self.moving_south and not self.can_move_south() or
-                self.moving_west and not self.can_move_west()):
-            return
-
-
         pos_x = self.rect.x - self.change_x
-        self.rect.x += self.change_x
-
         pos_y = self.rect.y
-        self.rect.y += self.change_y
 
         frame_multiplier = 6
         if self.moving_north:
@@ -236,6 +226,12 @@ class Player(pygame.sprite.Sprite):
             frame = (pos_x * frame_multiplier // self.sprite_width) % len(self.walking_frames_w)
             self.image = self.walking_frames_w[frame]
 
+        if (self.is_speed_and_direction_are_invalid()):
+            return
+
+        self.rect.x += self.change_x
+        self.rect.y += self.change_y
+
     def can_move_in_directions(self, x, y):
         for sprite in self.collision_sprite_group.sprites():
             rect = self.rect.copy()
@@ -244,6 +240,12 @@ class Player(pygame.sprite.Sprite):
             if sprite.rect.colliderect(rect):
                 return True
         return False
+
+    def is_speed_and_direction_are_invalid(self):
+        return (self.moving_north and not self.can_move_north() or
+                self.moving_east and not self.can_move_east() or
+                self.moving_south and not self.can_move_south() or
+                self.moving_west and not self.can_move_west())
 
     def can_move_north(self):
         return not self.can_move_in_directions(0, -self.speed)
