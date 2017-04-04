@@ -136,8 +136,16 @@ def get_brains_eaten_message_image(font, brains_eaten):
 class SpriteSheet(object):
     sprite_sheet = None
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, num_columns, num_rows):
         self.sprite_sheet = pygame.image.load(file_name).convert()
+        self.num_columns = num_columns
+        self.num_rows = num_rows
+
+    def get_sprite_width(self):
+        return self.get_width() // self.num_columns
+
+    def get_sprite_height(self):
+        return self.get_height() // self.num_rows
 
     def get_width(self):
         return self.sprite_sheet.get_width()
@@ -151,13 +159,13 @@ class SpriteSheet(object):
         image.set_colorkey(settings.BLACK)
         return image
 
-    def get_frames(self, col_start_index, row_start_index, width, height, sprite_cols):
+    def get_frames(self, col_start_index, row_start_index, sprite_cols):
         images = []
-        x = col_start_index * width
-        y = row_start_index * height
-        end_x = x + sprite_cols * width
-        for i in range(x, end_x, width):
-            images.append(self.get_image(i, y, width, height))
+        x = col_start_index * self.get_sprite_width()
+        y = row_start_index * self.get_sprite_height()
+        end_x = x + sprite_cols * self.get_sprite_width()
+        for i in range(x, end_x, self.get_sprite_width()):
+            images.append(self.get_image(i, y, self.get_sprite_width(), self.get_sprite_height()))
         assert len(images) == sprite_cols
         return images
 
@@ -192,18 +200,12 @@ class Player(pygame.sprite.Sprite):
 
         self.collision_sprite_group = collision_sprite_group
 
-        sprite_sheet = SpriteSheet('assets/zombie_topdown.png')
+        self.sprite_sheet = SpriteSheet('assets/zombie_topdown.png', num_columns=36, num_rows=8)
 
-        sprite_sheet_num_cols = 36
-        self.sprite_width = sprite_sheet.get_width() // sprite_sheet_num_cols
-
-        sprite_sheet_num_rows = 8
-        self.sprite_height = sprite_sheet.get_height() // sprite_sheet_num_rows
-
-        self.walking_frames_n = sprite_sheet.get_frames(4, 3, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_e = sprite_sheet.get_frames(4, 5, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_s = sprite_sheet.get_frames(4, 7, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_w = sprite_sheet.get_frames(4, 1, self.sprite_width, self.sprite_height, 7)
+        self.walking_frames_n = self.sprite_sheet.get_frames(col_start_index=4, row_start_index=3, sprite_cols=7)
+        self.walking_frames_e = self.sprite_sheet.get_frames(col_start_index=4, row_start_index=5, sprite_cols=7)
+        self.walking_frames_s = self.sprite_sheet.get_frames(col_start_index=4, row_start_index=7, sprite_cols=7)
+        self.walking_frames_w = self.sprite_sheet.get_frames(col_start_index=4, row_start_index=1, sprite_cols=7)
 
         self.image = self.walking_frames_n[0]
         self.rect = self.image.get_rect()
@@ -214,16 +216,16 @@ class Player(pygame.sprite.Sprite):
 
         frame_multiplier = 6
         if self.moving_north:
-            frame = (pos_y * frame_multiplier // self.sprite_width) % len(self.walking_frames_n)
+            frame = (pos_y * frame_multiplier // self.sprite_sheet.get_sprite_width()) % len(self.walking_frames_n)
             self.image = self.walking_frames_n[frame]
         elif self.moving_east:
-            frame = (pos_x * frame_multiplier // self.sprite_height) % len(self.walking_frames_e)
+            frame = (pos_x * frame_multiplier // self.sprite_sheet.get_sprite_height()) % len(self.walking_frames_e)
             self.image = self.walking_frames_e[frame]
         elif self.moving_south:
-            frame = (pos_y * frame_multiplier // self.sprite_height) % len(self.walking_frames_s)
+            frame = (pos_y * frame_multiplier // self.sprite_sheet.get_sprite_height()) % len(self.walking_frames_s)
             self.image = self.walking_frames_s[frame]
         elif self.moving_west:
-            frame = (pos_x * frame_multiplier // self.sprite_width) % len(self.walking_frames_w)
+            frame = (pos_x * frame_multiplier // self.sprite_sheet.get_sprite_width()) % len(self.walking_frames_w)
             self.image = self.walking_frames_w[frame]
 
         if (self.is_speed_and_direction_are_invalid()):
