@@ -3,9 +3,13 @@ import pygame
 from pygame.mixer import Sound
 from pygame.sprite import groupcollide
 import random
+import sys
 
 
 def main():
+
+    # ==== Setup ====
+
     pygame.init()
 
     size = [settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT]
@@ -14,7 +18,10 @@ def main():
 
     # ==== Init Screen ====
 
-    show_intro_screen = True
+    if len(sys.argv) >= 2 and sys.argv[1] == 'skip_intro':
+        show_intro_screen = False
+    else:
+        show_intro_screen = True
 
     intro_title_font_size = 60
     intro_title_font = pygame.font.Font('assets/jonathan-s-harris_something-strange/something_strange.ttf', intro_title_font_size)  # Default system font
@@ -144,6 +151,16 @@ class SpriteSheet(object):
         image.set_colorkey(settings.BLACK)
         return image
 
+    def get_frames(self, col_start_index, row_start_index, width, height, sprite_cols):
+        images = []
+        x = col_start_index * width
+        y = row_start_index * height
+        end_x = x + sprite_cols * width
+        for i in range(x, end_x, width):
+            images.append(self.get_image(i, y, width, height))
+        assert len(images) == sprite_cols
+        return images
+
 
 class Background(pygame.sprite.Sprite):
 
@@ -162,7 +179,7 @@ class Background(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     change_x = 0
     change_y = 0
-    speed = 6
+    speed = 18
 
     moving_north = False
     moving_east = False
@@ -183,21 +200,13 @@ class Player(pygame.sprite.Sprite):
         sprite_sheet_num_rows = 8
         self.sprite_height = sprite_sheet.get_height() // sprite_sheet_num_rows
 
-        self.walking_frames_n = self.get_sprite_images(sprite_sheet, 512, 384, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_e = self.get_sprite_images(sprite_sheet, 512, 640, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_s = self.get_sprite_images(sprite_sheet, 512, 896, self.sprite_width, self.sprite_height, 7)
-        self.walking_frames_w = self.get_sprite_images(sprite_sheet, 512, 128, self.sprite_width, self.sprite_height, 7)
+        self.walking_frames_n = sprite_sheet.get_frames(4, 3, self.sprite_width, self.sprite_height, 7)
+        self.walking_frames_e = sprite_sheet.get_frames(4, 5, self.sprite_width, self.sprite_height, 7)
+        self.walking_frames_s = sprite_sheet.get_frames(4, 7, self.sprite_width, self.sprite_height, 7)
+        self.walking_frames_w = sprite_sheet.get_frames(4, 1, self.sprite_width, self.sprite_height, 7)
 
         self.image = self.walking_frames_n[0]
         self.rect = self.image.get_rect()
-
-
-    def get_sprite_images(self, sprite_sheet, x, y, width, height, sprite_cols):
-        images = []
-        end_x = x + sprite_cols * width
-        for i in range(x, end_x, width):
-            images.append(sprite_sheet.get_image(i, y, width, height))
-        return images
 
     def update(self):
         if (self.moving_north and not self.can_move_north() or

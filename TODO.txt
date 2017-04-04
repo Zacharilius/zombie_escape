@@ -1,0 +1,20 @@
+Feature List
+
+[ ] Add enemy (Van Helsing's daughter).
+
+
+[ ] Health bar for zombie that decreases when it hasn't eaten for X seconds.
+When it reaches 0, the game is over.
+
+
+[ ] Smarter enemy with better AI.
+
+
+[ ] Multiple Levels. This requires creating an abstraction layer that converts
+level walls, background, etc into a level.
+
+
+[ ] More game metrics: Score, brains eaten, time survived. levels conquered.
+
+
+[ ] A database that tracks game metrics.
